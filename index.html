@@ -121,6 +121,8 @@
             let audio = new Audio("Alarm.wav")
             audio.play()
             alert("Timer finished!");
+            audio.pause()
+            audio.currentTime = 0;
           }
         }, 1000);
       }
