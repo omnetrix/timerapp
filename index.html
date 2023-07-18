@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>Timer App</title>
+    <title>Nord Timer</title>
     <meta name="description" content="" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="/css/stylesheet.css" />
@@ -16,7 +16,8 @@
     <link rel="icon" type="image/x-icon" href="/favicon.png" />
   </head>
   <body>
-    <h1 style="margin: 0">Timer</h1>
+    <audio id="alarmSound" src="/Alarm.mp3"></audio>
+    <h1 style="margin: 0">Nord Timer</h1>
     <div style="display: flex; justify-content: center">
       <h2 id="displayTimer">00:00:00</h2>
     </div>
@@ -54,92 +55,98 @@
       data-coffee-color="#FFDD00"
     ></script>
     <script>
-          let setTimerButton; // Declare the variable outside the function
+      let setTimerButton; // Declare the variable outside the function
 
-          function checkInput() {
-            let inputHours = parseInt(document.getElementById("inputHours").value);
-            let inputMinutes = parseInt(
-              document.getElementById("inputMinutes").value
-            );
-            let inputSeconds = parseInt(
-              document.getElementById("inputSeconds").value
-            );
+      function checkInput() {
+        let inputHours = parseInt(document.getElementById("inputHours").value);
+        let inputMinutes = parseInt(
+          document.getElementById("inputMinutes").value
+        );
+        let inputSeconds = parseInt(
+          document.getElementById("inputSeconds").value
+        );
 
-            setTimerButton = document.getElementById("setTimerButton");
+        setTimerButton = document.getElementById("setTimerButton");
 
-            if (inputMinutes > 0 || inputHours > 0 || inputSeconds > 0) {
-              setTimerButton.disabled = false;
-            } else {
-              setTimerButton.disabled = true;
+        if (inputMinutes > 0 || inputHours > 0 || inputSeconds > 0) {
+          setTimerButton.disabled = false;
+        } else {
+          setTimerButton.disabled = true;
+        }
+
+        inputHours =
+          inputHours > 1
+            ? (document.getElementById("textHours").innerText = "Hours")
+            : inputHours === 1
+            ? (document.getElementById("textHours").innerText = "Hour")
+            : (document.getElementById("textHours").innerText = "Hour(s)");
+        inputMinutes =
+          inputMinutes > 1
+            ? (document.getElementById("textMinutes").innerText = "Minutes")
+            : inputMinutes === 1
+            ? (document.getElementById("textMinutes").innerText = "Minute")
+            : (document.getElementById("textMinutes").innerText = "Minute(s)");
+        inputSeconds =
+          inputSeconds > 1
+            ? (document.getElementById("textSeconds").innerText = "Seconds")
+            : inputSeconds === 1
+            ? (document.getElementById("textSeconds").innerText = "Second")
+            : (document.getElementById("textSeconds").innerText = "Second(s)");
+      }
+
+      // Add option so that if it is NaN or negative it is still Second(s)
+      function setTimer() {
+        const displayTimer = document.getElementById("displayTimer");
+        let inputMinutes = parseInt(
+          document.getElementById("inputMinutes").value
+        );
+        let inputHours = parseInt(document.getElementById("inputHours").value);
+        let inputSeconds = parseInt(
+          document.getElementById("inputSeconds").value
+        );
+
+        inputMinutes = isNaN(inputMinutes) ? 0 : inputMinutes;
+        inputHours = isNaN(inputHours) ? 0 : inputHours;
+        inputSeconds = isNaN(inputSeconds) ? 0 : inputSeconds;
+
+        let duration = inputHours * 3600 + inputMinutes * 60 + inputSeconds;
+        let elapsedSeconds = 0;
+
+        var countdown = setInterval(function () {
+          const remainingSeconds = duration - elapsedSeconds;
+
+          let hours = Math.floor(remainingSeconds / 3600);
+          let minutes = Math.floor((remainingSeconds % 3600) / 60);
+          let seconds = Math.floor(remainingSeconds % 60);
+
+          hours = hours < 10 ? "0" + hours : hours;
+          minutes = minutes < 10 ? "0" + minutes : minutes;
+          seconds = seconds < 10 ? "0" + seconds : seconds;
+
+          displayTimer.textContent = hours + ":" + minutes + ":" + seconds;
+
+          elapsedSeconds++;
+
+          if (remainingSeconds <= 0) {
+            clearInterval(countdown);
+            displayTimer.textContent = "00:00:00";
+            var alarmSound = document.getElementById("alarmSound");
+            alarmSound.loop = true;
+            alarmSound.play();
+            document.title = "Timer Finished";
+
+            function showDialog() {
+              const resetConfirm = confirm("Timer finished!");
+              if (resetConfirm) {
+                alarmSound.pause();
+                alarmSound.currentTime = 0;
+              }
             }
 
-            inputHours =
-              inputHours > 1
-                ? (document.getElementById("textHours").innerText = "Hours")
-                : inputHours === 1
-                ? (document.getElementById("textHours").innerText = "Hour")
-                : (document.getElementById("textHours").innerText = "Hour(s)")
-            inputMinutes =
-              inputMinutes > 1
-                ? (document.getElementById("textMinutes").innerText = "Minutes")
-                : inputMinutes === 1
-                ? (document.getElementById("textMinutes").innerText = "Minute")
-                : (document.getElementById("textMinutes").innerText = "Minute(s)");
-            inputSeconds =
-              inputSeconds > 1
-                ? (document.getElementById("textSeconds").innerText = "Seconds")
-                : inputSeconds === 1
-                ? (document.getElementById("textSeconds").innerText = "Second")
-                : (document.getElementById("textSeconds").innerText = "Second(s)");
+            showDialog();
           }
-
-          // Add option so that if it is NaN or negative it is still Second(s)
-
-          function setTimer() {
-            const displayTimer = document.getElementById("displayTimer");
-            let inputMinutes = parseInt(
-              document.getElementById("inputMinutes").value
-            );
-            let inputHours = parseInt(document.getElementById("inputHours").value);
-            let inputSeconds = parseInt(
-              document.getElementById("inputSeconds").value
-            );
-
-            inputMinutes = isNaN(inputMinutes) ? 0 : inputMinutes;
-            inputHours = isNaN(inputHours) ? 0 : inputHours;
-            inputSeconds = isNaN(inputSeconds) ? 0 : inputSeconds;
-
-            let duration = inputHours * 3600 + inputMinutes * 60 + inputSeconds;
-            let elapsedSeconds = 0;
-
-            var countdown = setInterval(function () {
-              const remainingSeconds = duration - elapsedSeconds;
-
-              let hours = Math.floor(remainingSeconds / 3600);
-              let minutes = Math.floor((remainingSeconds % 3600) / 60);
-              let seconds = Math.floor(remainingSeconds % 60);
-
-              hours = hours < 10 ? "0" + hours : hours;
-              minutes = minutes < 10 ? "0" + minutes : minutes;
-              seconds = seconds < 10 ? "0" + seconds : seconds;
-
-              displayTimer.textContent = hours + ":" + minutes + ":" + seconds;
-
-              elapsedSeconds++;
-
-              if (remainingSeconds <= 0) {
-                clearInterval(countdown);
-                displayTimer.textContent = "00:00:00";
-                let audio = new Audio("/Alarm.mp3");
-                audio.play()
-                document.title = "Timer Finished";
-                alert("Timer finished!");
-                audio.pause()
-                audio.currentTime = 0;
-                document.title = "Timer App";
-              }
-            }, 1000);
-          }
+        }, 1000);
+      }
     </script>
   </body>
 </html>
